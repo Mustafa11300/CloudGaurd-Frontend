@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import AppSidebar from "./AppSidebar";
 import AppHeader from "./AppHeader";
 
-const transition = { type: "spring", duration: 0.4, bounce: 0 };
+const transition = { type: "spring" as const, duration: 0.4, bounce: 0 };
 const pageVariants = {
   initial: { opacity: 0, y: 4 },
   enter: { opacity: 1, y: 0, transition },
