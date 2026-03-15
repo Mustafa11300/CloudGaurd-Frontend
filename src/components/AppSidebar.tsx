@@ -2,7 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import { Activity, LayoutDashboard, Terminal, Shield, DollarSign, MessageSquare, Settings, Zap } from "lucide-react";
 
 const navItems = [
-  { to: "/", icon: Activity, label: "Overview" },
+  { to: "/", icon: LayoutDashboard, label: "Product" },
+  { to: "/dashboard", icon: Activity, label: "Dashboard" },
   { to: "/findings", icon: Shield, label: "Findings" },
   { to: "/cost", icon: DollarSign, label: "Cost Analysis" },
   { to: "/copilot", icon: MessageSquare, label: "AI Copilot" },
