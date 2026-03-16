@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, Loader2 } from "lucide-react";
 import AppSidebar from "./AppSidebar";
 import AppHeader from "./AppHeader";
-import { runScan } from "@/data/api";
+import { runScan, getScore } from "@/data/api";
 
 const transition = { type: "spring" as const, duration: 0.4, bounce: 0 };
 const pageVariants = {
@@ -14,12 +14,34 @@ const pageVariants = {
 };
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
-  const { pathname }    = useLocation();
-  const isHome          = pathname === "/";
-  const [sidebarOpen,   setSidebarOpen]   = useState(false);
-  const [scanning,      setScanning]      = useState(false);
-  const [lastScan,      setLastScan]      = useState("08:22 UTC");
-  const [scanMsg,       setScanMsg]       = useState<string | null>(null);
+  const { pathname } = useLocation();
+  const isHome       = pathname === "/";
+
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [scanning,    setScanning]    = useState(false);
+  const [lastScan,    setLastScan]    = useState("Loading...");
+  const [scanMsg,     setScanMsg]     = useState<string | null>(null);
+
+  // Fetch real last scan time from backend on mount
+  useEffect(() => {
+    getScore()
+      .then(score => {
+        if (score.last_scan && score.last_scan !== "N/A" && score.last_scan !== "Run bootstrap.py first") {
+          const date = new Date(score.last_scan);
+          setLastScan(
+            date.toLocaleTimeString("en-US", {
+              hour:     "2-digit",
+              minute:   "2-digit",
+              hour12:   false,
+              timeZone: "UTC",
+            }) + " UTC"
+          );
+        } else {
+          setLastScan("No scans yet");
+        }
+      })
+      .catch(() => setLastScan("Unknown"));
+  }, []);
 
   const handleRunScan = async () => {
     if (scanning) return;
@@ -30,21 +52,20 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
       const result = await runScan();
 
       if (result.status === "success") {
-        // Update last scan time
+        // Update last scan time to now
         const now = new Date();
         setLastScan(
           now.toLocaleTimeString("en-US", {
-            hour:   "2-digit",
-            minute: "2-digit",
-            hour12: false,
+            hour:     "2-digit",
+            minute:   "2-digit",
+            hour12:   false,
+            timeZone: "UTC",
           }) + " UTC"
         );
         setScanMsg(
           `✅ Scan complete — Score: ${result.security_score}/100 · ${result.total_findings} findings · $${result.monthly_waste} waste`
         );
-        // Auto-hide message after 5 seconds
         setTimeout(() => setScanMsg(null), 5000);
-        // Reload the page to refresh all data
         setTimeout(() => window.location.reload(), 1000);
       } else {
         setScanMsg(`❌ Scan failed: ${result.message}`);
