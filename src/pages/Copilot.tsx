@@ -48,7 +48,7 @@ const Copilot = () => {
     setIsTyping(true);
 
     // Call real backend
-    fetch("http://localhost:8000/api/chat/", {
+    fetch("https://cloud-security-copilot-qd4o.onrender.com/api/chat/", {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
       body:    JSON.stringify({ message: msg }),
