@@ -1,14 +1,23 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { severityCounts } from "@/data/mockData";
-
-const data = [
-  { name: "Critical", value: severityCounts.critical, color: "hsl(0, 84%, 60%)" },
-  { name: "High", value: severityCounts.high, color: "hsl(38, 92%, 50%)" },
-  { name: "Medium", value: severityCounts.medium, color: "hsl(199, 89%, 48%)" },
-  { name: "Low", value: severityCounts.low, color: "hsl(217, 19%, 40%)" },
-];
+import { useEffect, useState } from "react";
+import { getFindingsSummary } from "@/data/api";
 
 const SeverityChart = () => {
+  const [counts, setCounts] = useState({ critical: 0, high: 0, medium: 0, low: 0 });
+
+  useEffect(() => {
+    getFindingsSummary()
+      .then(d => setCounts({ critical: d.critical, high: d.high, medium: d.medium, low: d.low }))
+      .catch(() => {});
+  }, []);
+
+  const data = [
+    { name: "Critical", value: counts.critical, color: "hsl(0, 84%, 60%)"   },
+    { name: "High",     value: counts.high,     color: "hsl(38, 92%, 50%)"  },
+    { name: "Medium",   value: counts.medium,   color: "hsl(199, 89%, 48%)" },
+    { name: "Low",      value: counts.low,      color: "hsl(217, 19%, 40%)" },
+  ];
+
   const total = data.reduce((s, d) => s + d.value, 0);
 
   return (
@@ -30,17 +39,15 @@ const SeverityChart = () => {
                 dataKey="value"
                 stroke="none"
               >
-                {data.map((entry, i) => (
-                  <Cell key={i} fill={entry.color} />
-                ))}
+                {data.map((entry, i) => <Cell key={i} fill={entry.color} />)}
               </Pie>
               <Tooltip
                 contentStyle={{
-                  background: "hsl(222, 30%, 7%)",
-                  border: "1px solid hsl(217, 19%, 14%)",
+                  background:   "hsl(222, 30%, 7%)",
+                  border:       "1px solid hsl(217, 19%, 14%)",
                   borderRadius: "6px",
-                  fontSize: "12px",
-                  color: "hsl(210, 40%, 98%)",
+                  fontSize:     "12px",
+                  color:        "hsl(210, 40%, 98%)",
                 }}
               />
             </PieChart>
@@ -51,9 +58,11 @@ const SeverityChart = () => {
             <div key={d.name} className="flex items-center gap-3">
               <div className="w-2.5 h-2.5 rounded-sm" style={{ background: d.color }} />
               <span className="text-xs text-muted-foreground w-14">{d.name}</span>
-              <span className="text-sm font-mono font-semibold text-foreground" data-metric>{d.value}</span>
+              <span className="text-sm font-mono font-semibold text-foreground" data-metric>
+                {d.value}
+              </span>
               <span className="text-[10px] text-muted-foreground font-mono">
-                ({Math.round((d.value / total) * 100)}%)
+                ({total > 0 ? Math.round((d.value / total) * 100) : 0}%)
               </span>
             </div>
           ))}
