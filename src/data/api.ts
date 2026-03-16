@@ -1,4 +1,4 @@
-const BASE = "http://localhost:8000/api";
+const BASE = "https://cloud-security-copilot-qd4o.onrender.com/api";
 
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`);
@@ -140,7 +140,7 @@ export function buildMetrics(score: ScoreData): MetricData[] {
 }
 
 export const runScan = () =>
-  fetch("http://localhost:8000/api/score/scan", {
+  fetch("https://cloud-security-copilot-qd4o.onrender.com/api/score/scan", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
   }).then(r => r.json());
