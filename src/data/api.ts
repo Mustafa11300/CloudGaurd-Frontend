@@ -138,3 +138,9 @@ export function buildMetrics(score: ScoreData): MetricData[] {
     },
   ];
 }
+
+export const runScan = () =>
+  fetch("http://localhost:8000/api/score/scan", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  }).then(r => r.json());
