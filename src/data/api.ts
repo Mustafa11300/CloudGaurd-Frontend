@@ -42,7 +42,7 @@ export interface MetricData {
 export interface ScoreData {
   security_score:    number;
   cost_health_score: number;
-  monthly_waste:     number;
+  monthly_waste_usd:     number;
   total_findings:    number;
   critical_count:    number;
   high_count:        number;
@@ -73,7 +73,7 @@ export interface CostItem {
   instance_type:   string;
   region:          string;
   cpu_avg:         number;
-  monthly_cost:    number;
+  monthly_cost_usd:    number;
   estimated_waste: number;
 }
 
@@ -126,8 +126,8 @@ export function buildMetrics(score: ScoreData): MetricData[] {
     },
     {
       label:  "Monthly Waste",
-      value:  `$${Math.round(score.monthly_waste).toLocaleString()}`,
-      trend:  `$${Math.round(score.monthly_waste * 12).toLocaleString()}/yr projected`,
+      value:  `$${Math.round(score.monthly_waste_usd ?? 0).toLocaleString()}`,
+      trend:  `$${Math.round((score.monthly_waste_usd ?? 0) * 12).toLocaleString()}/yr projected`,
       status: toStatus("warning"),
     },
     {
